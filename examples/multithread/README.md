@@ -8,3 +8,29 @@ To run, do:
 Then, open another terminal and do:
 
     $ python client
+
+Output for multithread.py
+ 
+    ~/repos/pyzmq/examples/multithread $ python multithread.py 
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+    Received request: [ b'Hello' ]
+
+Ouput for client.py
+
+    ~/repos/pyzmq/examples/multithread $ python client.py 
+    Connecting to hello world server…
+    Sending request 0 …
+    Received reply 0 [ b'World' ]
+    Sending request 1 …
+    Received reply 1 [ b'World' ]
+    Sending request 2 …
+    Received reply 2 [ b'World' ]
+    Sending request 3 …
+    
