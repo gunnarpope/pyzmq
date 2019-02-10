@@ -23,8 +23,9 @@ while True:
     s = receiver.recv()
 
 # Simple progress indicator for the viewer
-sys.stdout.write('.')
-sys.stdout.flush()
+# sys.stdout.write('.')
+# sys.stdout.flush()
+print('.')
 
 # Do the work
 time.sleep(int(s)*0.001)

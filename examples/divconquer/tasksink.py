@@ -23,9 +23,11 @@ total_msec = 0
 for task_nbr in range(100):
     s = receiver.recv()
     if task_nbr % 10 == 0:
-        sys.stdout.write(':')
+        # sys.stdout.write(':')
+        print(':')
     else:
-        sys.stdout.write('.')
+       # sys.stdout.write('.')
+       print('.')
 
 # Calculate and report duration of batch
 tend = time.time()
