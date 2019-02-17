@@ -1,8 +1,6 @@
 """
 publisher.py
 
-Copyright (c) 2019 Gunnar Pope
-
 A simple example of a Pub-Sub connection using ZeroMQ.
 The Publisher prints out the current time every second
 
@@ -16,8 +14,8 @@ $ python client.py
 """
 
 #-----------------------------------------------------------------------------
-# The original author to this example:
-#  Copyright (c) 2010 Brian Granger
+#  Original Copyright (c) 2010 Brian Granger
+#  Edits Copyright (c) 2019 Gunnar Pope
 #
 #  Distributed under the terms of the New BSD License.  The full license is in
 #  the file COPYING.BSD, distributed as part of this software.
