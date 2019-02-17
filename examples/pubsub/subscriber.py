@@ -1,9 +1,23 @@
-"""A test that subscribes to NumPy arrays.
 
-Uses REQ/REP (on PUB/SUB socket + 1) to synchronize
+"""
+subscriber.py
+
+Copyright (c) 2019 Gunnar Pope
+
+A simple example of a Pub-Sub connection using ZeroMQ.
+The Subscriber recieves the time from the Publisher each second.
+
+To run, open a terminal and enter:
+$ python publisher.py
+
+After that, open any amount of clients in a new terminal to subscribe to
+the publisher by entering:
+$ python client.py
+
 """
 
 #-----------------------------------------------------------------------------
+# The original author to this example:
 #  Copyright (c) 2010 Brian Granger
 #
 #  Distributed under the terms of the New BSD License.  The full license is in
@@ -11,64 +25,21 @@ Uses REQ/REP (on PUB/SUB socket + 1) to synchronize
 #-----------------------------------------------------------------------------
 
 
-import sys
 import time
-
 import zmq
-import numpy
 
-def sync(connect_to):
-    # use connect socket + 1
-    sync_with = ':'.join(connect_to.split(':')[:-1] +
-                         [str(int(connect_to.split(':')[-1]) + 1)]
-                        )
-    ctx = zmq.Context.instance()
-    s = ctx.socket(zmq.REQ)
-    s.connect(sync_with)
-    s.send('READY')
-    s.recv()
+address="tcp://127.0.0.1:5555"
+context = zmq.Context()
+socket = context.socket(zmq.SUB)
+socket.connect(address)
+socket.setsockopt(zmq.SUBSCRIBE,''.encode('utf-8'))
 
-def main():
-    if len (sys.argv) != 3:
-        print('usage: subscriber <connect_to> <array-count>')
-        sys.exit (1)
-
+print('Starting A Subsciber....')
+while True:
     try:
-        connect_to = sys.argv[1]
-        array_count = int (sys.argv[2])
-    except (ValueError, OverflowError) as e:
-        print('array-count must be integers')
-        sys.exit (1)
-
-    ctx = zmq.Context()
-    s = ctx.socket(zmq.SUB)
-    s.connect(connect_to)
-    s.setsockopt(zmq.SUBSCRIBE,'')
-
-    sync(connect_to)
-
-    start = time.clock()
-
-    print("Receiving arrays...")
-    for i in range(array_count):
-        a = s.recv_pyobj()
-    print("   Done.")
-
-    end = time.clock()
-
-    elapsed = (end - start) * 1000000
-    if elapsed == 0:
-    	elapsed = 1
-    throughput = (1000000.0 * float (array_count)) / float (elapsed)
-    message_size = a.nbytes
-    megabits = float (throughput * message_size * 8) / 1000000
-
-    print("message size: %.0f [B]" % (message_size, ))
-    print("array count: %.0f" % (array_count, ))
-    print("mean throughput: %.0f [msg/s]" % (throughput, ))
-    print("mean throughput: %.3f [Mb/s]" % (megabits, ))
-
-    time.sleep(1.0)
-
-if __name__ == "__main__":
-    main()
+        text = socket.recv()
+        print(text)
+    except ( KeyboardInterrupt, SystemExit ):
+        socket.term()                                                  # .term  ALWAYS!
+        context.close()                                                     # .close ALWAYS!
+        break

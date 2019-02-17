@@ -1,57 +1,46 @@
-"""A test that publishes NumPy arrays.
+"""
+publisher.py
 
-Uses REQ/REP (on PUB/SUB socket + 1) to synchronize
+Copyright (c) 2019 Gunnar Pope
+
+A simple example of a Pub-Sub connection using ZeroMQ.
+The Publisher prints out the current time every second
+
+To run, open a terminal and enter:
+$ python publisher.py
+
+After that, open any amount of clients in a new terminal to subscribe to
+the publisher by entering:
+$ python client.py
+
 """
 
 #-----------------------------------------------------------------------------
+# The original author to this example:
 #  Copyright (c) 2010 Brian Granger
 #
 #  Distributed under the terms of the New BSD License.  The full license is in
 #  the file COPYING.BSD, distributed as part of this software.
 #-----------------------------------------------------------------------------
 
-import sys
 import time
-
 import zmq
-import numpy
 
-def sync(bind_to):
-    # use bind socket + 1
-    sync_with = ':'.join(bind_to.split(':')[:-1] +
-                         [str(int(bind_to.split(':')[-1]) + 1)])
-    ctx = zmq.Context.instance()
-    s = ctx.socket(zmq.REP)
-    s.bind(sync_with)
-    print("Waiting for subscriber to connect...")
-    s.recv()
-    print("   Done.")
-    s.send('GO')
 
-def main():
-    if len (sys.argv) != 4:
-        print('usage: publisher <bind-to> <array-size> <array-count>')
-        sys.exit (1)
+address ='tcp://127.0.0.1:5555'
+context = zmq.Context().instance()
+socket  = context.socket(zmq.PUB)
+socket.bind(address)
 
+print('Starting The Publisher....')
+while True:
     try:
-        bind_to = sys.argv[1]
-        array_size = int(sys.argv[2])
-        array_count = int (sys.argv[3])
-    except (ValueError, OverflowError) as e:
-        print('array-size and array-count must be integers')
-        sys.exit (1)
+        string = time.asctime( time.localtime(time.time()) )
+        socket.send_string(string)
+        print('Sending Time: ',string)
+        time.sleep(1.0)
 
-    ctx = zmq.Context()
-    s = ctx.socket(zmq.PUB)
-    s.bind(bind_to)
-
-    sync(bind_to)
-
-    print("Sending arrays...")
-    for i in range(array_count):
-        a = numpy.random.rand(array_size, array_size)
-        s.send_pyobj(a)
-    print("   Done.")
-
-if __name__ == "__main__":
-    main()
+    except ( KeyboardInterrupt, SystemExit ):
+        socket.term()                                                  # .term  ALWAYS!
+        context.close()                                                     # .close ALWAYS!
+        break
