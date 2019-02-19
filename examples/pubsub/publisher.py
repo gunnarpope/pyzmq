@@ -22,6 +22,7 @@ $ python client.py
 #-----------------------------------------------------------------------------
 
 import time
+from datetime import datetime
 import zmq
 
 
@@ -33,10 +34,11 @@ socket.bind(address)
 print('Starting The Publisher....')
 while True:
     try:
-        string = time.asctime( time.localtime(time.time()) )
-        socket.send_string(string)
-        print('Sending Time: ',string)
-        time.sleep(1.0)
+        
+        timestr = datetime.now().__format__("%Y-%m-%dT%H-%M-%S.%f")
+        socket.send_string(timestr)
+        print('Sending Time: ',timestr)
+        time.sleep(0.01)
 
     except ( KeyboardInterrupt, SystemExit ):
         socket.term()                                                  # .term  ALWAYS!
